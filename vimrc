@@ -1,40 +1,37 @@
-set nocompatible              " be iMproved, required
-filetype off                  " required
+set nocompatible " Disable vi compatibility
+filetype off 
 
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
-" alternatively, pass a path where Vundle should install plugins
-"call vundle#begin('~/some/path/here')
 
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'mattn/emmet-vim'
 Plugin 'daylerees/colour-schemes', {'rtp': 'vim/'}
+Plugin 'godlygeek/tabular'
+Plugin 'kien/ctrlp.vim'
+Plugin 'shawncplus/phpcomplete.vim'
+Plugin 'jiangmiao/auto-pairs'
+Plugin 'majutsushi/tagbar'
+Bundle 'sickill/vim-pasta'
+Plugin 'vim-scripts/ZoomWin'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
-" To ignore plugin indent changes, instead use:
-"filetype plugin on
-"
-" Brief help
-" :PluginList       - lists configured plugins
-" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
-" :PluginSearch foo - searches for foo; append `!` to refresh local cache
-" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
-"
-" see :h vundle for more details or wiki for FAQ
 " Put your non-Plugin stuff after this line
 
+colorscheme Grunge
 set t_Co=256
-set guifont=Menlo\ for\ Powerline:h14 " Set font name and size
+"set guifont=Menlo\ for\ Powerline:h16 " Set font name and size
+set guifont=Fira\ Code:h16
 set guioptions-=r " Removes right hand scroll bar
-colorscheme Grunge " Set the current color scheme
 set number " Show line numbers
 set go-=L " Removes left hand scroll bar
 set linespace=15
 set showmode " always show what mode we're currently editing in
+"set showcmd "Show command in bottom right portion of the screen
 set nowrap " don't wrap lines
 set tabstop=4 " a tab is four spaces
 set smarttab
@@ -53,13 +50,74 @@ set visualbell " don't beep
 set noerrorbells " don't beep
 set autowrite "Save on buffer switch
 set mouse=a
+"set ruler "Display current cursor position in lower right corner
+set hidden "Switch between buffers without saving
+set nohlsearch "Highlight searching
 
 " With a map leader it's possible to do extra key combinations
 " like <leader>w saves the current file
 let mapleader = ","
 let g:mapleader = ","
+
 " Fast saves
-nmap <leader>w :w!<cr>
+nnoremap <leader>w :w!<cr>
+
+" Down is really the next line
+nnoremap j gj
+nnoremap k gk
+
+" Remove search results
+command! H let @/=""
 
 "Auto change directory to match current file ,cd
 nnoremap ,cd :cd %:p:h<CR>:pwd<CR>
+
+" Easier window navigation
+nmap <C-h> <C-w>h
+nmap <C-j> <C-w>j
+nmap <C-k> <C-w>k
+nmap <C-l> <C-w>l
+
+" Swap files out of the project directory
+set backupdir=~/.vim/backup//
+set directory=~/.vim/swap//
+
+" Laravel specifics
+" Abbreviations
+abbrev mm !php artisan make:model
+abbrev mc !php artisan make:controller
+abbrev mg !php artisan make:migration
+
+" I Don't want to pull up vendor files when I do CtrlP
+set wildignore+=*/vendor/**
+set wildignore+=*/node_modules/**
+
+" Source the vimrc file after saving it
+if has("autocmd")
+  autocmd bufwritepost .vimrc source $MYVIMRC
+endif
+
+" Open vimrc file for edit
+" Replace :tabedit with edit, split, vsplit
+nnoremap <leader>v :tabedit $MYVIMRC<CR>
+
+" Disable the arrow keys
+nnoremap <Up> :echomsg "use k"<cr>
+nnoremap <Down> :echomsg "use j"<cr>
+nnoremap <Left> :echomsg "use h"<cr>
+nnoremap <Right> :echomsg "use l"<cr>
+
+" clean up netrw config
+let g:netrw_browse_split=0
+let g:netrw_liststyle=0
+let g:netrw_banner=0
+let g:netrw_list_hide='.git'
+
+" Change a word to uppercase
+inoremap <c-u> <esc>viwU<esc>i
+
+" Surround a word with quotes
+nnoremap <leader>' viw<esc>a'<esc>hbi'<esc>lel
+
+" Toggle Tagbar
+nnoremap <F8> :TagbarToggle<cr>
