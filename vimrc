@@ -1,37 +1,32 @@
-set nocompatible " Disable vi compatibility
-filetype off 
+set nocompatible " Disable vi compatibility, prefer the latest vim settings
+"
+so ~/.vim/plugins.vim
 
-" set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-
-" let Vundle manage Vundle, required
-Plugin 'VundleVim/Vundle.vim'
-Plugin 'mattn/emmet-vim'
-Plugin 'daylerees/colour-schemes', {'rtp': 'vim/'}
-Plugin 'godlygeek/tabular'
-Plugin 'kien/ctrlp.vim'
-Plugin 'shawncplus/phpcomplete.vim'
-Plugin 'jiangmiao/auto-pairs'
-Plugin 'majutsushi/tagbar'
-Bundle 'sickill/vim-pasta'
-Plugin 'vim-scripts/ZoomWin'
-
-" All of your Plugins must be added before the following line
-call vundle#end()            " required
-filetype plugin indent on    " required
-" Put your non-Plugin stuff after this line
-
+"------------------General Settings-------------------"
+syntax enable
 colorscheme Grunge
 set t_Co=256
-"set guifont=Menlo\ for\ Powerline:h16 " Set font name and size
-set guifont=Fira\ Code:h16
+set pastetoggle=<F2>
+let mapleader = ","
+let g:mapleader = ","
+
+set nobackup " do not keep backup files, it's 70's style cluttering
+set noswapfile   " do not write annoying intermediate swap files
+set directory=~/.vim/swap// " Swap files out of the project directory, incase it is ever turned on
+set backupdir=~/.vim/backup//
+
+
+"------------------Gui options--------------------
+set macligatures
+set guifont=Fira\ Code:h17
+set guioptions-=l " Removes left hand scroll bar
+set guioptions-=L 
 set guioptions-=r " Removes right hand scroll bar
+set guioptions-=R 
 set number " Show line numbers
 set go-=L " Removes left hand scroll bar
 set linespace=15
 set showmode " always show what mode we're currently editing in
-"set showcmd "Show command in bottom right portion of the screen
 set nowrap " don't wrap lines
 set tabstop=4 " a tab is four spaces
 set smarttab
@@ -50,15 +45,18 @@ set visualbell " don't beep
 set noerrorbells " don't beep
 set autowrite "Save on buffer switch
 set mouse=a
-"set ruler "Display current cursor position in lower right corner
+set showmatch " show matching brackets
 set hidden "Switch between buffers without saving
-set nohlsearch "Highlight searching
 
-" With a map leader it's possible to do extra key combinations
-" like <leader>w saves the current file
-let mapleader = ","
-let g:mapleader = ","
 
+"----------------Search-------------------
+set hlsearch "Highlight searching
+set incsearch " Show search results as I type
+set ignorecase " ignore case when searching
+set smartcase " ignore case if search pattern is all lowercase,
+
+
+"----------------Mappings-------------------
 " Fast saves
 nnoremap <leader>w :w!<cr>
 
@@ -66,52 +64,22 @@ nnoremap <leader>w :w!<cr>
 nnoremap j gj
 nnoremap k gk
 
-" Remove search results
-command! H let @/=""
+" Remove search results highlighting
+nnoremap <leader><space> :nohlsearch<cr>
 
 "Auto change directory to match current file ,cd
 nnoremap ,cd :cd %:p:h<CR>:pwd<CR>
 
-" Easier window navigation
-nmap <C-h> <C-w>h
-nmap <C-j> <C-w>j
-nmap <C-k> <C-w>k
-nmap <C-l> <C-w>l
-
-" Swap files out of the project directory
-set backupdir=~/.vim/backup//
-set directory=~/.vim/swap//
-
-" Laravel specifics
-" Abbreviations
-abbrev mm !php artisan make:model
-abbrev mc !php artisan make:controller
-abbrev mg !php artisan make:migration
-
-" I Don't want to pull up vendor files when I do CtrlP
-set wildignore+=*/vendor/**
-set wildignore+=*/node_modules/**
-
-" Source the vimrc file after saving it
-if has("autocmd")
-  autocmd bufwritepost .vimrc source $MYVIMRC
-endif
-
 " Open vimrc file for edit
 " Replace :tabedit with edit, split, vsplit
 nnoremap <leader>v :tabedit $MYVIMRC<CR>
+nnoremap <leader>p :tabedit ~/.vim/plugins.vim<CR>
 
 " Disable the arrow keys
 nnoremap <Up> :echomsg "use k"<cr>
 nnoremap <Down> :echomsg "use j"<cr>
 nnoremap <Left> :echomsg "use h"<cr>
 nnoremap <Right> :echomsg "use l"<cr>
-
-" clean up netrw config
-let g:netrw_browse_split=0
-let g:netrw_liststyle=0
-let g:netrw_banner=0
-let g:netrw_list_hide='.git'
 
 " Change a word to uppercase
 inoremap <c-u> <esc>viwU<esc>i
@@ -121,3 +89,48 @@ nnoremap <leader>' viw<esc>a'<esc>hbi'<esc>lel
 
 " Toggle Tagbar
 nnoremap <F8> :TagbarToggle<cr>
+
+" Toggle NERDTree
+nnoremap <D-1> :NERDTreeToggle<cr>
+
+" CtrlP tags
+nnoremap <D-r> :CtrlPBufTag<cr>
+
+" CtrlP recently opened files
+nnoremap <D-e> :CtrlPMRUFiles<cr>
+
+
+" Easier window navigation
+set splitright
+set splitbelow
+nmap <C-h> <C-w>h
+nmap <C-j> <C-w>j
+nmap <C-k> <C-w>k
+nmap <C-l> <C-w>l
+
+" Move visual block up or down with indentation
+vnoremap J :m '>+1<CR>gv=gv
+vnoremap K :m '<-2<CR>gv=gv
+
+"------------Abbreviations-----------------------
+abbrev mm !php artisan make:model
+abbrev mc !php artisan make:controller
+abbrev mg !php artisan make:migration
+
+
+
+" Source the vimrc file after saving it
+augroup autosourcing
+    autocmd!
+    " source vimrc file when saving
+    autocmd bufwritepost .vimrc source % 
+
+    " refresh NERDTree when its window is focused, far better than always pressing R
+    autocmd WinEnter * if exists('b:NERDTree') | execute 'normal R' | endif
+augroup END
+
+"------------------Plugins------------------
+set wildignore+=*/vendor/**
+set wildignore+=*/node_modules/**
+let g:ctrlp_custom_ignore = 'node_modules\DS_Store\|git'
+let g:ctrlp_match_window = 'bottom,order:ttb,min:1,max:30,results:30'
